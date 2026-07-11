@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/fb/Button";
 import { Input } from "@/components/fb/Input";
@@ -25,9 +25,9 @@ function AuthPage() {
   const { login, register, user } = useAuth();
   const navigate = useNavigate();
 
-  if (user) {
-    navigate({ to: "/", replace: true });
-  }
+  useEffect(() => {
+    if (user) navigate({ to: "/", replace: true });
+  }, [user, navigate]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
