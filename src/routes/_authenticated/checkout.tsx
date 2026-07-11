@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useCart } from "@/store/cart";
 import { useAuth } from "@/lib/auth";
 import { PICKUP_POINTS } from "@/lib/products";
@@ -41,11 +41,11 @@ function Checkout() {
   const [errors, setErrors] = useState<Errors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const submittedRef = useRef(false);
 
   useEffect(() => {
-    if (count === 0 && !submitted) navigate({ to: "/cart", replace: true });
-  }, [count, navigate, submitted]);
+    if (count === 0 && !submittedRef.current) navigate({ to: "/cart", replace: true });
+  }, [count, navigate]);
 
   function validate(): Errors {
     const e: Errors = {};
@@ -101,7 +101,7 @@ function Checkout() {
     const prev = JSON.parse(localStorage.getItem("fb_orders") || "[]");
     localStorage.setItem("fb_orders", JSON.stringify([order, ...prev]));
 
-    setSubmitted(true);
+    submittedRef.current = true;
     clear();
     setLoading(false);
     navigate({ to: "/confirmation/$orderId", params: { orderId } });
