@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useCart } from "@/store/cart";
 import { useAuth } from "@/lib/auth";
 import { PICKUP_POINTS } from "@/lib/products";
@@ -34,9 +34,9 @@ function Checkout() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  if (count === 0) {
-    throw redirect({ to: "/cart" });
-  }
+  useEffect(() => {
+    if (count === 0) navigate({ to: "/cart", replace: true });
+  }, [count, navigate]);
 
   const [name, setName] = useState(user?.name || "");
   const [card, setCard] = useState("");
