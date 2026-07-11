@@ -101,6 +101,7 @@ function Checkout() {
     const prev = JSON.parse(localStorage.getItem("fb_orders") || "[]");
     localStorage.setItem("fb_orders", JSON.stringify([order, ...prev]));
 
+    setSubmitted(true);
     clear();
     setLoading(false);
     navigate({ to: "/confirmation/$orderId", params: { orderId } });
