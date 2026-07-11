@@ -1,5 +1,5 @@
 import { useCutoff } from "@/lib/cutoff";
-import { Badge } from "@/components/ui/Card";
+import { Badge } from "@/components/fb/Card";
 
 export function CutoffTimer() {
   const s = useCutoff();

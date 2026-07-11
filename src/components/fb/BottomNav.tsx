@@ -1,11 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
-const items = [
+const items: Array<{ to: "/" | "/orders" | "/profile"; label: string; icon: string; exact?: boolean }> = [
   { to: "/", label: "Home", icon: "home", exact: true },
   { to: "/orders", label: "Ordini", icon: "receipt_long" },
   { to: "/profile", label: "Profilo", icon: "person" },
-] as const;
+];
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
