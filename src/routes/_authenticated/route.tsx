@@ -1,25 +1,30 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/fb/Header";
 import { BottomNav } from "@/components/fb/BottomNav";
 
 export const Route = createFileRoute("/_authenticated")({
+  ssr: false,
   component: AuthenticatedLayout,
 });
 
 function AuthenticatedLayout() {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background">
         <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-primary border-t-transparent" />
       </div>
     );
-  }
-
-  if (!user) {
-    throw redirect({ to: "/auth" });
   }
 
   return (
