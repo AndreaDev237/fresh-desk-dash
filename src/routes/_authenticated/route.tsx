@@ -5,7 +5,6 @@ import { Header } from "@/components/fb/Header";
 import { BottomNav } from "@/components/fb/BottomNav";
 
 export const Route = createFileRoute("/_authenticated")({
-  ssr: false,
   component: AuthenticatedLayout,
 });
 
