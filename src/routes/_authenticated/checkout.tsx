@@ -34,10 +34,6 @@ function Checkout() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (count === 0) navigate({ to: "/cart", replace: true });
-  }, [count, navigate]);
-
   const [name, setName] = useState(user?.name || "");
   const [card, setCard] = useState("");
   const [exp, setExp] = useState("");
@@ -45,6 +41,11 @@ function Checkout() {
   const [errors, setErrors] = useState<Errors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (count === 0 && !submitted) navigate({ to: "/cart", replace: true });
+  }, [count, navigate, submitted]);
 
   function validate(): Errors {
     const e: Errors = {};
