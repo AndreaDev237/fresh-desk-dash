@@ -1,33 +1,54 @@
 ## Obiettivo
-Aggiungere un toggle tema (chiaro/scuro) nell'header con icone sole/luna. Cliccando si alterna il tema; la scelta persiste tra sessioni.
+Aggiungere una **Box del Giorno** in evidenza in home, con sconto -25% sul prezzo pieno, tempo limitato (fino al cut-off giornaliero), messa in cima al catalogo. Se in carrello: badge distintivo. Sconto quantità -15% cumulativo quando l'utente compra ≥3 unità della box del giorno.
 
 ## Cambiamenti
 
-### 1. `src/styles.css` — variante dark
-- Aggiungere un blocco `.dark { ... }` con override dei token colore chiave (background, surface, surface-container*, on-surface, on-surface-variant, outline, outline-variant, card, popover, muted, accent, border, input, ring-offset-background, primary-container tuning se serve) per una palette scura coerente con Fresh Desk (verde primario mantenuto, sfondi scuri es. `#101410` / `#181c18`, testo chiaro).
-- Il custom variant `dark` esiste già (`@custom-variant dark (&:is(.dark *))`), quindi utilities `dark:` funzionano, ma la strategia principale è l'override dei CSS variables su `.dark` così i componenti esistenti si adattano senza modifiche.
+### 1. `src/lib/products.ts`
+- Aggiungere un 4° prodotto `box-del-giorno` con:
+  - `id: "box-del-giorno"`, nome es. "Box del Giorno", descrizione dedicata
+  - `price`: prezzo scontato (es. 6.00) e `originalPrice: 8.00` (nuovo campo opzionale)
+  - `isDeal: true` (nuovo campo)
+  - `discountPct: 25` (per label)
+  - Riuso dell'immagine `boxPremium` (o una delle esistenti) — non abbiamo asset nuovi
+- Estendere il tipo `Product` con `originalPrice?: number`, `isDeal?: boolean`, `discountPct?: number`
+- Esportare costante `DAILY_DEAL_QTY_THRESHOLD = 3` e `DAILY_DEAL_QTY_DISCOUNT = 0.15`
 
-### 2. `src/lib/theme.tsx` (nuovo) — ThemeProvider
-- Context con `theme: 'light' | 'dark'` e `toggleTheme()`.
-- Init: legge `localStorage.getItem('fb-theme')`; fallback a `light` (per evitare mismatch SSR non tenta di leggere `prefers-color-scheme` prima dell'hydration).
-- `useEffect` applica/rimuove la classe `dark` su `document.documentElement` e persiste in localStorage.
-- Aggiornare `theme-color` meta opzionalmente (nice-to-have, non bloccante).
+### 2. `src/routes/_authenticated/index.tsx` — Home
+- Individuare il prodotto con `isDeal` e renderizzarlo **sopra** il resto del catalogo dentro una card "hero deal" distintiva:
+  - Bordo/ring in colore `secondary-container` o gradiente, badge grande "PROMO -25%"
+  - Countdown al cut-off (riuso `useCutoff()` per mostrare "Termina tra HH:MM")
+  - Prezzo scontato grande + prezzo originale barrato accanto
+  - Bottone "Aggiungi" identico agli altri (usa `add(p.id)`)
+- Gli altri 3 prodotti continuano a renderizzarsi sotto, invariati
+- Ordinamento: filtro `PRODUCTS` in due liste (`deal` + `rest`), deal sempre primo
 
-### 3. `src/routes/__root.tsx`
-- Avvolgere `<CartProvider>` con `<ThemeProvider>` (dentro `QueryClientProvider`, fuori/dentro `AuthProvider` — lo metto come outermost dopo QueryClient così è disponibile ovunque).
+### 3. `src/store/cart.tsx`
+- Aggiungere logica sconto quantità nel `useMemo`:
+  - Calcolare `dealDiscount`: se un item ha `product.isDeal` e `qty >= 3`, applicare -15% su `lineTotal` di quell'item
+  - Restituire nuovi campi in `CartCtx`: `dealDiscount: number` (totale sconto in €), `subtotal` resta il subtotale pre-sconto, aggiungere `total: number` (subtotal - dealDiscount)
+- I `lineTotal` in `detailed` restano al prezzo pieno; lo sconto è mostrato come riga separata (più chiaro per l'utente)
 
-### 4. `src/components/fb/ThemeToggle.tsx` (nuovo)
-- Bottone rotondo 44×44 (coerente col carrello) con `aria-label` dinamico ("Attiva tema scuro" / "Attiva tema chiaro"), `aria-pressed`.
-- Icona: Material Symbols `light_mode` quando tema è dark (mostra cosa attiverai) oppure convenzione opposta — scelgo la convenzione comune: mostra l'icona del tema **corrente** (`light_mode` se light, `dark_mode` se dark). Al click chiama `toggleTheme()`.
-- Classe `press` e hover come il bottone carrello.
+### 4. `src/routes/_authenticated/cart.tsx`
+- Nell'item del carrello, se `product.isDeal`:
+  - Mostrare badge "PROMO -25%" accanto al nome
+  - Bordo/accent colorato sulla card (`border-secondary`)
+  - Se `qty >= 3`: piccola label sotto il prezzo "Sconto 3+ attivo: -15%"
+  - Se `qty < 3` e `qty >= 1`: hint "Aggiungi {3-qty} per -15%"
+- Sezione totali: aggiungere riga "Sconto quantità" (solo se > 0) tra Subtotale e Totale
+- Totale finale usa `total` invece di `subtotal`
+- Passare il totale scontato al checkout (già usa il context, quindi automatico se checkout legge `total`)
 
-### 5. `src/components/fb/Header.tsx`
-- Inserire `<ThemeToggle />` a sinistra del link carrello nella parte destra dell'header.
+### 5. `src/routes/_authenticated/checkout.tsx` & `confirmation.$orderId.tsx`
+- Verificare che leggano `total` (nuovo) invece di `subtotal` per l'importo pagato. Aggiornare se necessario.
 
 ## Non fare
-- Nessuna modifica alle pagine, al carrello, alla logica di business.
-- Nessuna preferenza di sistema auto-applicata (evita FOUC/hydration mismatch); solo scelta esplicita utente, default light.
-- Nessuna animazione elaborata (basta la transizione colori esistente).
+- Nessuna modifica a auth, cut-off, punti di ritiro, tema
+- Nessun nuovo asset immagine (riuso di quelli esistenti)
+- Nessuna rotazione dinamica: la box del giorno è un prodotto fisso hardcoded (coerente con "catalogo fisso")
 
 ## Verifica
-- Toggle nell'header, click alterna tema, refresh mantiene la scelta, tutte le schermate (home, carrello, checkout, conferma, ordini, profilo, auth) restano leggibili in dark.
+- Home: box del giorno in cima, badge -25%, prezzo barrato visibile
+- Aggiunta al carrello funziona
+- Carrello: card evidenziata, hint sotto 3, sconto -15% attivo da 3+
+- Totale riflette lo sconto; checkout e conferma mostrano l'importo corretto
+- Gli altri 3 box funzionano come prima
