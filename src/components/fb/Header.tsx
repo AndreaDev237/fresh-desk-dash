@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import logo from "@/assets/logo.png.asset.json";
 import { useCart } from "@/store/cart";
+import { ThemeToggle } from "@/components/fb/ThemeToggle";
 
 export function Header() {
   const { count } = useCart();
@@ -13,20 +14,23 @@ export function Header() {
             Frutteria
           </span>
         </Link>
-        <Link
-          to="/cart"
-          aria-label="Vai al carrello"
-          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full press hover:bg-surface-container"
-        >
-          <span className="material-symbols-outlined text-[26px] text-on-surface">
-            shopping_cart
-          </span>
-          {count > 0 && (
-            <span className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-surface bg-secondary-container px-1 text-[10px] font-bold text-on-secondary-container">
-              {count}
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <Link
+            to="/cart"
+            aria-label="Vai al carrello"
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full press hover:bg-surface-container"
+          >
+            <span className="material-symbols-outlined text-[26px] text-on-surface">
+              shopping_cart
             </span>
-          )}
-        </Link>
+            {count > 0 && (
+              <span className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-surface bg-secondary-container px-1 text-[10px] font-bold text-on-secondary-container">
+                {count}
+              </span>
+            )}
+          </Link>
+        </div>
       </div>
     </header>
   );

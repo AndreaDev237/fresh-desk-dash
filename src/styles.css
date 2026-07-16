@@ -91,6 +91,71 @@
   --shadow-premium-hover: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 15px -5px rgba(0, 0, 0, 0.05);
 }
 
+/* Dark theme — override CSS variables when .dark is on <html>. */
+.dark {
+  --color-primary: #9dd761;
+  --color-on-primary: #143700;
+  --color-primary-container: #2c5000;
+  --color-on-primary-container: #b8f47a;
+
+  --color-secondary: #ffb77b;
+  --color-on-secondary: #4b2600;
+  --color-secondary-container: #6d3a00;
+  --color-on-secondary-container: #ffdcc2;
+
+  --color-tertiary: #ffade3;
+  --color-on-tertiary: #56004a;
+  --color-tertiary-container: #7c1e69;
+  --color-on-tertiary-container: #ffd8ee;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  --color-surface: #111411;
+  --color-surface-dim: #111411;
+  --color-surface-bright: #373934;
+  --color-surface-container-lowest: #0b0d0a;
+  --color-surface-container-low: #1a1d19;
+  --color-surface-container: #1e211d;
+  --color-surface-container-high: #282b26;
+  --color-surface-container-highest: #333630;
+  --color-surface-variant: #424939;
+  --color-surface-tint: #9dd761;
+
+  --color-on-surface: #e2e3dc;
+  --color-on-surface-variant: #c2c9b5;
+  --color-inverse-surface: #e2e3dc;
+  --color-inverse-on-surface: #2c3039;
+
+  --color-outline: #8c9280;
+  --color-outline-variant: #424939;
+
+  --color-background: #111411;
+  --color-on-background: #e2e3dc;
+
+  --color-foreground: #e2e3dc;
+  --color-card: #1e211d;
+  --color-card-foreground: #e2e3dc;
+  --color-popover: #1e211d;
+  --color-popover-foreground: #e2e3dc;
+  --color-primary-foreground: #143700;
+  --color-secondary-foreground: #4b2600;
+  --color-muted: #282b26;
+  --color-muted-foreground: #c2c9b5;
+  --color-accent: #1a1d19;
+  --color-accent-foreground: #e2e3dc;
+  --color-destructive: #ffb4ab;
+  --color-destructive-foreground: #690005;
+  --color-border: #424939;
+  --color-input: #424939;
+  --color-ring: #9dd761;
+  --color-ring-offset-background: #111411;
+
+  color-scheme: dark;
+}
+
 @layer base {
   * {
     border-color: var(--color-outline-variant);
