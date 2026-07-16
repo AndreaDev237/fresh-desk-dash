@@ -84,10 +84,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Frutteria Boolean — Ordina la tua frutta-box" },
       {
         property: "og:description",
-        content: "Frutta fresca monoporzione, pronta in ufficio alle 13:00.",
+        content: "Ordina la tua frutta-box monoporzione entro le 10:00 e ritirala in ufficio alle 13:00. Zero attese.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Frutteria Boolean — Ordina la tua frutta-box" },
+      { name: "twitter:description", content: "Ordina la tua frutta-box monoporzione entro le 10:00 e ritirala in ufficio alle 13:00. Zero attese." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/02b460b0-a087-44bb-b964-2268bad23f07/id-preview-d29bcaa3--1b8cf52f-44d0-42a6-bd2f-7eb13ff70bcf.lovable.app-1783759591135.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/02b460b0-a087-44bb-b964-2268bad23f07/id-preview-d29bcaa3--1b8cf52f-44d0-42a6-bd2f-7eb13ff70bcf.lovable.app-1783759591135.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
