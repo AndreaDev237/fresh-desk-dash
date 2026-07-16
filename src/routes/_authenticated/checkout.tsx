@@ -30,7 +30,7 @@ function formatExp(v: string) {
 }
 
 function Checkout() {
-  const { detailed, subtotal, clear, count } = useCart();
+  const { detailed, total, clear, count } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -93,7 +93,7 @@ function Checkout() {
         qty: d.qty,
         price: d.product.price,
       })),
-      total: subtotal,
+      total,
       pickup: pickup.name,
       pickupDetail: pickup.detail,
       status: "confermato",
@@ -119,7 +119,7 @@ function Checkout() {
       <div className="flex items-center justify-between rounded-lg border border-outline-variant/40 bg-surface-container-low p-3">
         <span className="text-[13px] text-on-surface-variant">Totale da pagare</span>
         <span className="text-[22px] font-extrabold text-primary tabular-nums">
-          € {subtotal.toFixed(2).replace(".", ",")}
+          € {total.toFixed(2).replace(".", ",")}
         </span>
       </div>
 
@@ -173,7 +173,7 @@ function Checkout() {
         )}
 
         <Button type="submit" size="lg" fullWidth loading={loading}>
-          Paga € {subtotal.toFixed(2).replace(".", ",")}
+          Paga € {total.toFixed(2).replace(".", ",")}
         </Button>
 
         <div className="flex items-center justify-center gap-3 pt-2 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">
