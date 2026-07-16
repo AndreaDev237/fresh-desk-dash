@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCart } from "@/store/cart";
-import { PICKUP_POINTS } from "@/lib/products";
+import { PICKUP_POINTS, DAILY_DEAL_QTY_THRESHOLD } from "@/lib/products";
 import { Button } from "@/components/fb/Button";
 import location from "@/assets/location.png.asset.json";
 
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/cart")({
 });
 
 function CartPage() {
-  const { detailed, subtotal, setQty, remove, count } = useCart();
+  const { detailed, subtotal, dealDiscount, total, setQty, remove, count } = useCart();
   const [pickup, setPickup] = useState<string>(PICKUP_POINTS[0].id);
   const navigate = useNavigate();
 
@@ -24,60 +24,90 @@ function CartPage() {
       <h1 className="text-[24px] font-bold text-on-surface">Il tuo carrello</h1>
 
       <section className="flex flex-col gap-3">
-        {detailed.map(({ product, qty, lineTotal }) => (
-          <div
-            key={product.id}
-            className="flex gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-3 shadow-premium"
-          >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-20 w-20 shrink-0 rounded-md object-cover"
-            />
-            <div className="flex min-w-0 flex-1 flex-col justify-between">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <h3 className="truncate text-[15px] font-bold text-on-surface">{product.name}</h3>
-                  <p className="text-[13px] font-semibold text-primary">
-                    € {product.price.toFixed(2).replace(".", ",")}
+        {detailed.map(({ product, qty, lineTotal, dealApplied }) => {
+          const isDeal = !!product.isDeal;
+          const missingForDeal = isDeal ? Math.max(0, DAILY_DEAL_QTY_THRESHOLD - qty) : 0;
+          return (
+            <div
+              key={product.id}
+              className={`flex gap-3 rounded-lg border p-3 shadow-premium ${
+                isDeal
+                  ? "border-2 border-secondary bg-surface-container-lowest"
+                  : "border-outline-variant/40 bg-surface-container-lowest"
+              }`}
+            >
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-20 w-20 shrink-0 rounded-md object-cover"
+              />
+              <div className="flex min-w-0 flex-1 flex-col justify-between">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="truncate text-[15px] font-bold text-on-surface">
+                        {product.name}
+                      </h3>
+                      {isDeal && (
+                        <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-on-secondary">
+                          -{product.discountPct}%
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[13px] font-semibold text-primary">
+                      € {product.price.toFixed(2).replace(".", ",")}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => remove(product.id)}
+                    aria-label={`Rimuovi ${product.name}`}
+                    className="shrink-0 rounded-full p-1 text-on-surface-variant hover:bg-surface-container press"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="inline-flex items-center rounded-full border border-outline-variant bg-surface-container-low">
+                    <button
+                      type="button"
+                      onClick={() => setQty(product.id, qty - 1)}
+                      aria-label="Diminuisci"
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-on-surface press"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">remove</span>
+                    </button>
+                    <span className="w-6 text-center text-[14px] font-bold tabular-nums">
+                      {qty}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setQty(product.id, qty + 1)}
+                      aria-label="Aumenta"
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-on-surface press"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">add</span>
+                    </button>
+                  </div>
+                  <span className="text-[15px] font-bold text-on-surface">
+                    € {lineTotal.toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+                {isDeal && dealApplied && (
+                  <p className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-secondary">
+                    <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                    Sconto 3+ attivo: -15%
                   </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => remove(product.id)}
-                  aria-label={`Rimuovi ${product.name}`}
-                  className="shrink-0 rounded-full p-1 text-on-surface-variant hover:bg-surface-container press"
-                >
-                  <span className="material-symbols-outlined text-[20px]">delete</span>
-                </button>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center rounded-full border border-outline-variant bg-surface-container-low">
-                  <button
-                    type="button"
-                    onClick={() => setQty(product.id, qty - 1)}
-                    aria-label="Diminuisci"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-on-surface press"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">remove</span>
-                  </button>
-                  <span className="w-6 text-center text-[14px] font-bold tabular-nums">{qty}</span>
-                  <button
-                    type="button"
-                    onClick={() => setQty(product.id, qty + 1)}
-                    aria-label="Aumenta"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-on-surface press"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">add</span>
-                  </button>
-                </div>
-                <span className="text-[15px] font-bold text-on-surface">
-                  € {lineTotal.toFixed(2).replace(".", ",")}
-                </span>
+                )}
+                {isDeal && !dealApplied && missingForDeal > 0 && (
+                  <p className="mt-1 text-[11px] font-semibold text-on-surface-variant">
+                    Aggiungi {missingForDeal} per uno sconto extra -15%
+                  </p>
+                )}
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       {/* Dropoff */}
@@ -126,9 +156,12 @@ function CartPage() {
       {/* Totals */}
       <section className="flex flex-col gap-2 rounded-lg border border-outline-variant/40 bg-surface-container-low p-4 shadow-premium">
         <Row label="Subtotale" value={subtotal} />
+        {dealDiscount > 0 && (
+          <Row label="Sconto quantità (Box del Giorno)" value={-dealDiscount} accent />
+        )}
         <Row label="Ritiro" value={0} zeroLabel="Gratuito" />
         <div className="my-1 border-t border-outline-variant/40" />
-        <Row label="Totale" value={subtotal} bold />
+        <Row label="Totale" value={total} bold />
       </section>
 
       <Button
@@ -151,21 +184,35 @@ function Row({
   value,
   bold,
   zeroLabel,
+  accent,
 }: {
   label: string;
   value: number;
   bold?: boolean;
   zeroLabel?: string;
+  accent?: boolean;
 }) {
+  const formatted =
+    value === 0 && zeroLabel
+      ? zeroLabel
+      : `${value < 0 ? "− " : ""}€ ${Math.abs(value).toFixed(2).replace(".", ",")}`;
   return (
     <div className="flex items-center justify-between">
-      <span className={`text-[14px] ${bold ? "font-bold text-on-surface" : "text-on-surface-variant"}`}>
+      <span
+        className={`text-[14px] ${bold ? "font-bold text-on-surface" : accent ? "font-semibold text-secondary" : "text-on-surface-variant"}`}
+      >
         {label}
       </span>
       <span
-        className={`tabular-nums ${bold ? "text-[20px] font-extrabold text-primary" : "text-[14px] font-semibold text-on-surface"}`}
+        className={`tabular-nums ${
+          bold
+            ? "text-[20px] font-extrabold text-primary"
+            : accent
+              ? "text-[14px] font-bold text-secondary"
+              : "text-[14px] font-semibold text-on-surface"
+        }`}
       >
-        {value === 0 && zeroLabel ? zeroLabel : `€ ${value.toFixed(2).replace(".", ",")}`}
+        {formatted}
       </span>
     </div>
   );
