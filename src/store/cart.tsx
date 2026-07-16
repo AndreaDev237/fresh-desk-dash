@@ -1,5 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { PRODUCTS, type Product } from "@/lib/products";
+import {
+  PRODUCTS,
+  DAILY_DEAL_QTY_THRESHOLD,
+  DAILY_DEAL_QTY_DISCOUNT,
+  type Product,
+} from "@/lib/products";
 
 export type CartItem = { productId: string; qty: number };
 
@@ -11,7 +16,9 @@ type CartCtx = {
   clear: () => void;
   count: number;
   subtotal: number;
-  detailed: Array<{ product: Product; qty: number; lineTotal: number }>;
+  dealDiscount: number;
+  total: number;
+  detailed: Array<{ product: Product; qty: number; lineTotal: number; dealApplied: boolean }>;
 };
 
 const CartContext = createContext<CartCtx | null>(null);
@@ -38,9 +45,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
       .map((i) => {
         const product = PRODUCTS.find((p) => p.id === i.productId);
         if (!product) return null;
-        return { product, qty: i.qty, lineTotal: product.price * i.qty };
+        const dealApplied = !!product.isDeal && i.qty >= DAILY_DEAL_QTY_THRESHOLD;
+        return {
+          product,
+          qty: i.qty,
+          lineTotal: product.price * i.qty,
+          dealApplied,
+        };
       })
-      .filter((x): x is { product: Product; qty: number; lineTotal: number } => x !== null);
+      .filter(
+        (x): x is { product: Product; qty: number; lineTotal: number; dealApplied: boolean } =>
+          x !== null,
+      );
+
+    const subtotal = detailed.reduce((s, i) => s + i.lineTotal, 0);
+    const dealDiscount = detailed.reduce(
+      (s, i) => (i.dealApplied ? s + i.lineTotal * DAILY_DEAL_QTY_DISCOUNT : s),
+      0,
+    );
 
     return {
       items,
@@ -63,7 +85,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         ),
       clear: () => setItems([]),
       count: detailed.reduce((s, i) => s + i.qty, 0),
-      subtotal: detailed.reduce((s, i) => s + i.lineTotal, 0),
+      subtotal,
+      dealDiscount,
+      total: subtotal - dealDiscount,
       detailed,
     };
   }, [items]);

@@ -9,9 +9,27 @@ export type Product = {
   price: number;
   image: string;
   badge?: { label: string; variant: "primary" | "secondary" };
+  originalPrice?: number;
+  isDeal?: boolean;
+  discountPct?: number;
 };
 
+export const DAILY_DEAL_QTY_THRESHOLD = 3;
+export const DAILY_DEAL_QTY_DISCOUNT = 0.15;
+
 export const PRODUCTS: Product[] = [
+  {
+    id: "box-del-giorno",
+    name: "Box del Giorno",
+    description:
+      "Selezione speciale della giornata: frutta di stagione a prezzo scontato, solo fino al cut-off.",
+    price: 6.0,
+    originalPrice: 8.0,
+    isDeal: true,
+    discountPct: 25,
+    image: boxPremium.url,
+    badge: { label: "Promo -25%", variant: "secondary" },
+  },
   {
     id: "box-snack",
     name: "Box Snack d'Ufficio",
