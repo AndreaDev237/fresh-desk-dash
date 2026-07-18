@@ -1,13 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-
-type Order = {
-  id: string;
-  createdAt: string;
-  total: number;
-  pickup: string;
-  items: Array<{ name: string; qty: number }>;
-};
+import { listOrders, type Order } from "@/lib/orders";
 
 export const Route = createFileRoute("/_authenticated/orders")({
   head: () => ({ meta: [{ title: "I miei ordini — Frutteria Boolean" }] }),
@@ -16,17 +9,39 @@ export const Route = createFileRoute("/_authenticated/orders")({
 
 function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    try {
-      setOrders(JSON.parse(localStorage.getItem("fb_orders") || "[]"));
-    } catch {}
+    let cancelled = false;
+    listOrders()
+      .then((data) => {
+        if (!cancelled) setOrders(data);
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Errore caricamento ordini");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
     <div className="flex flex-col gap-5 px-4 pt-4 pb-6">
       <h1 className="text-[24px] font-bold text-on-surface">I miei ordini</h1>
 
-      {orders.length === 0 ? (
+      {loading ? (
+        <div className="rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-6 text-center text-[13px] text-on-surface-variant">
+          Caricamento…
+        </div>
+      ) : error ? (
+        <div className="rounded-md bg-error-container px-3 py-2 text-[13px] font-medium text-on-error-container">
+          {error}
+        </div>
+      ) : orders.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
           <span className="material-symbols-outlined text-[48px] text-on-surface-variant/60">
             receipt_long
@@ -47,11 +62,11 @@ function Orders() {
             <Link
               key={o.id}
               to="/confirmation/$orderId"
-              params={{ orderId: o.id }}
+              params={{ orderId: o.code }}
               className="flex flex-col gap-2 rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-4 shadow-premium press"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[15px] font-bold text-primary">#{o.id}</span>
+                <span className="text-[15px] font-bold text-primary">#{o.code}</span>
                 <span className="text-[12px] text-on-surface-variant">
                   {new Date(o.createdAt).toLocaleDateString("it-IT", {
                     day: "2-digit",
