@@ -81,8 +81,8 @@ function Profile() {
         variant="secondary"
         size="lg"
         fullWidth
-        onClick={() => {
-          logout();
+        onClick={async () => {
+          await logout();
           navigate({ to: "/auth" });
         }}
         icon={<span className="material-symbols-outlined text-[20px]">logout</span>}
