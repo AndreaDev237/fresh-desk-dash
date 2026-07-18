@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { PICKUP_POINTS } from "@/lib/products";
 import { Button } from "@/components/fb/Button";
 import { Input } from "@/components/fb/Input";
+import { createOrder } from "@/lib/orders";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({
@@ -15,11 +16,6 @@ export const Route = createFileRoute("/_authenticated/checkout")({
 
 type Errors = Partial<Record<"name" | "card" | "exp" | "cvc", string>>;
 
-function generateOrderId() {
-  const n = Math.floor(1000 + Math.random() * 9000);
-  return `FB-${n}`;
-}
-
 function formatCard(v: string) {
   return v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
 }
@@ -28,6 +24,7 @@ function formatExp(v: string) {
   if (d.length < 3) return d;
   return `${d.slice(0, 2)}/${d.slice(2)}`;
 }
+
 
 function Checkout() {
   const { detailed, total, clear, count } = useCart();
