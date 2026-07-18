@@ -1,16 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import checkmark from "@/assets/checkmark.png.asset.json";
 import location from "@/assets/location.png.asset.json";
 import { Button } from "@/components/fb/Button";
-
-type Order = {
-  id: string;
-  createdAt: string;
-  items: Array<{ productId: string; name: string; qty: number; price: number }>;
-  total: number;
-  pickup: string;
-  pickupDetail: string;
-};
+import { getOrderByCode, type Order } from "@/lib/orders";
 
 export const Route = createFileRoute("/_authenticated/confirmation/$orderId")({
   head: () => ({
@@ -24,14 +17,20 @@ export const Route = createFileRoute("/_authenticated/confirmation/$orderId")({
 
 function Confirmation() {
   const { orderId } = Route.useParams();
+  const [order, setOrder] = useState<Order | null>(null);
 
-  let order: Order | null = null;
-  if (typeof window !== "undefined") {
-    try {
-      const orders: Order[] = JSON.parse(localStorage.getItem("fb_orders") || "[]");
-      order = orders.find((o) => o.id === orderId) || null;
-    } catch {}
-  }
+  useEffect(() => {
+    let cancelled = false;
+    getOrderByCode(orderId)
+      .then((o) => {
+        if (!cancelled) setOrder(o);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId]);
+
 
   return (
     <div className="flex flex-col gap-6 px-4 pt-6 pb-6">
