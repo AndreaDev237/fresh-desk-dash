@@ -22,12 +22,20 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login, register, user } = useAuth();
+  const { login, register, loginWithGoogle, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) navigate({ to: "/", replace: true });
   }, [user, navigate]);
+
+  async function onGoogle() {
+    setError(null);
+    setLoading(true);
+    const res = await loginWithGoogle();
+    setLoading(false);
+    if (!res.ok) setError(res.error || "Errore Google Sign-In");
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
