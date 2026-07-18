@@ -17,6 +17,7 @@ import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AuthenticatedConfirmationOrderIdRouteImport } from './routes/_authenticated/confirmation.$orderId'
+import { Route as ApiPublicHooksNotifyOrderRouteImport } from './routes/api/public/hooks/notify-order'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -58,6 +59,12 @@ const AuthenticatedConfirmationOrderIdRoute =
     path: '/confirmation/$orderId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicHooksNotifyOrderRoute =
+  ApiPublicHooksNotifyOrderRouteImport.update({
+    id: '/api/public/hooks/notify-order',
+    path: '/api/public/hooks/notify-order',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/orders': typeof AuthenticatedOrdersRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/confirmation/$orderId': typeof AuthenticatedConfirmationOrderIdRoute
+  '/api/public/hooks/notify-order': typeof ApiPublicHooksNotifyOrderRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -76,6 +84,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/': typeof AuthenticatedIndexRoute
   '/confirmation/$orderId': typeof AuthenticatedConfirmationOrderIdRoute
+  '/api/public/hooks/notify-order': typeof ApiPublicHooksNotifyOrderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,6 +96,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/confirmation/$orderId': typeof AuthenticatedConfirmationOrderIdRoute
+  '/api/public/hooks/notify-order': typeof ApiPublicHooksNotifyOrderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/profile'
     | '/confirmation/$orderId'
+    | '/api/public/hooks/notify-order'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/'
     | '/confirmation/$orderId'
+    | '/api/public/hooks/notify-order'
   id:
     | '__root__'
     | '/_authenticated'
@@ -117,11 +129,13 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/'
     | '/_authenticated/confirmation/$orderId'
+    | '/api/public/hooks/notify-order'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicHooksNotifyOrderRoute: typeof ApiPublicHooksNotifyOrderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -182,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfirmationOrderIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/notify-order': {
+      id: '/api/public/hooks/notify-order'
+      path: '/api/public/hooks/notify-order'
+      fullPath: '/api/public/hooks/notify-order'
+      preLoaderRoute: typeof ApiPublicHooksNotifyOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -209,17 +230,8 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicHooksNotifyOrderRoute: ApiPublicHooksNotifyOrderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
