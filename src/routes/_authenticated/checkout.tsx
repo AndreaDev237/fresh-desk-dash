@@ -77,7 +77,7 @@ function Checkout() {
       return;
     }
 
-    const pickupId0 = null; void pickupId0;
+    
     const pickupId = sessionStorage.getItem("fb_pickup") || PICKUP_POINTS[0].id;
     const pickup = PICKUP_POINTS.find((p) => p.id === pickupId) || PICKUP_POINTS[0];
 
