@@ -81,27 +81,30 @@ function Checkout() {
     const pickupId = sessionStorage.getItem("fb_pickup") || PICKUP_POINTS[0].id;
     const pickup = PICKUP_POINTS.find((p) => p.id === pickupId) || PICKUP_POINTS[0];
 
-    const order = {
-      id: orderId,
-      createdAt: new Date().toISOString(),
-      items: detailed.map((d) => ({
-        productId: d.product.id,
-        name: d.product.name,
-        qty: d.qty,
-        price: d.product.price,
-      })),
-      total,
-      pickup: pickup.name,
-      pickupDetail: pickup.detail,
-      status: "confermato",
-    };
-    const prev = JSON.parse(localStorage.getItem("fb_orders") || "[]");
-    localStorage.setItem("fb_orders", JSON.stringify([order, ...prev]));
+    try {
+      const order = await createOrder({
+        items: detailed.map((d) => ({
+          productId: d.product.id,
+          name: d.product.name,
+          qty: d.qty,
+          price: d.product.price,
+        })),
+        total,
+        pickupName: pickup.name,
+        pickupDetail: pickup.detail,
+      });
 
-    submittedRef.current = true;
-    clear();
-    setLoading(false);
-    navigate({ to: "/confirmation/$orderId", params: { orderId } });
+      submittedRef.current = true;
+      clear();
+      setLoading(false);
+      navigate({ to: "/confirmation/$orderId", params: { orderId: order.code } });
+    } catch (err) {
+      setLoading(false);
+      setSubmitError(
+        err instanceof Error ? err.message : "Errore durante il salvataggio dell'ordine.",
+      );
+    }
+
   }
 
   return (
