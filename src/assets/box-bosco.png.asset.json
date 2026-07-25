@@ -1,11 +1,4 @@
 {
   "version": 1,
-  "asset_id": "69b4ada6-4444-4af3-942b-9f844def61a8",
-  "project_id": "1b8cf52f-44d0-42a6-bd2f-7eb13ff70bcf",
-  "url": "/__l5e/assets-v1/69b4ada6-4444-4af3-942b-9f844def61a8/box-bosco.png",
-  "r2_key": "a/v1/1b8cf52f-44d0-42a6-bd2f-7eb13ff70bcf/69b4ada6-4444-4af3-942b-9f844def61a8/box-bosco.png",
-  "original_filename": "box-bosco.png",
-  "size": 1850435,
-  "content_type": "image/png",
-  "created_at": "2026-07-11T08:33:00Z"
+  "url": "/box-bosco.png"
 }

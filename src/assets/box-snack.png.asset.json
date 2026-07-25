@@ -1,11 +1,4 @@
 {
   "version": 1,
-  "asset_id": "74081c11-21e2-4671-ad6b-e1eb689aad15",
-  "project_id": "1b8cf52f-44d0-42a6-bd2f-7eb13ff70bcf",
-  "url": "/__l5e/assets-v1/74081c11-21e2-4671-ad6b-e1eb689aad15/box-snack.png",
-  "r2_key": "a/v1/1b8cf52f-44d0-42a6-bd2f-7eb13ff70bcf/74081c11-21e2-4671-ad6b-e1eb689aad15/box-snack.png",
-  "original_filename": "box-snack.png",
-  "size": 698469,
-  "content_type": "image/png",
-  "created_at": "2026-07-11T08:32:59Z"
+  "url": "/box-snack.png"
 }

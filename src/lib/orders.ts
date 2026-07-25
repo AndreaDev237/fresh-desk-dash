@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/utils/supabase";
 
 export type OrderItem = {
   productId: string;
